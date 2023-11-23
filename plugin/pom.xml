@@ -18,7 +18,7 @@
     </properties>
 
     <build>
-        <finalName>OreProcessor-${project.version}</finalName>
+        <finalName>OreProcessorLite-${project.version}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -127,12 +127,6 @@
             <groupId>co.aikar</groupId>
             <artifactId>acf-paper</artifactId>
             <version>0.5.1-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.vlkan.rfos</groupId>
-            <artifactId>rotating-fos</artifactId>
-            <version>0.9.5</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

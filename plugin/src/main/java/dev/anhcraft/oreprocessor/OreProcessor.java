@@ -110,9 +110,10 @@ public final class OreProcessor extends JavaPlugin {
         pcm.enableUnstableAPI("help");
         pcm.registerCommand(new OreCommand(this));
         pcm.registerCommand(new ModifyCommand(this));
-        pcm.registerCommand(new UpgradeCommand(this));
-        pcm.registerCommand(new StoreCommand(this));
-        pcm.registerCommand(new StatsCommand(this));
+        //
+        //
+        //
+        //
         CommandCompletions<BukkitCommandCompletionContext> cmpl = pcm.getCommandCompletions();
         cmpl.registerAsyncCompletion("ores", context -> API.getOres());
         cmpl.registerAsyncCompletion("materials", context -> Arrays.stream(Material.values()).map(Material::name).collect(Collectors.toList()));
@@ -153,8 +154,8 @@ public final class OreProcessor extends JavaPlugin {
         GuiRegistry.MENU = ConfigHelper.load(MenuGui.class, requestConfig("gui/menu.yml"));
         GuiRegistry.UPGRADE = ConfigHelper.load(UpgradeGui.class, requestConfig("gui/upgrade.yml"));
         GuiRegistry.STORAGE = ConfigHelper.load(StorageGui.class, requestConfig("gui/storage.yml"));
-        GuiRegistry.CRAFTING = ConfigHelper.load(CraftingGui.class, requestConfig("gui/crafting.yml"));
-        GuiRegistry.INSPECT = ConfigHelper.load(InspectGui.class, requestConfig("gui/inspect.yml"));
+        //
+        //
 
         processingPlant.reload();
         serverDataManager.reload();

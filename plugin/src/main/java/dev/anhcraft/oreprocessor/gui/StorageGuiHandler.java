@@ -5,15 +5,10 @@ import dev.anhcraft.oreprocessor.OreProcessor;
 import dev.anhcraft.oreprocessor.api.Ore;
 import dev.anhcraft.oreprocessor.api.data.OreData;
 import dev.anhcraft.oreprocessor.api.data.PlayerData;
-import dev.anhcraft.oreprocessor.integration.shop.ShopProvider;
-import dev.anhcraft.oreprocessor.util.ScopedLog;
 import dev.anhcraft.palette.event.ClickEvent;
 import dev.anhcraft.palette.ui.GuiHandler;
-import dev.anhcraft.palette.ui.element.Slot;
 import dev.anhcraft.palette.util.ItemReplacer;
 import dev.anhcraft.palette.util.ItemUtil;
-import net.milkbowl.vault.economy.EconomyResponse;
-import org.apache.commons.lang.mutable.MutableDouble;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -22,7 +17,10 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 public class StorageGuiHandler extends GuiHandler implements AutoRefresh {
     private final static NumberFormat numberFormat = NumberFormat.getInstance();
@@ -59,7 +57,7 @@ public class StorageGuiHandler extends GuiHandler implements AutoRefresh {
         listen("craft", new ClickEvent() {
             @Override
             public void onClick(@NotNull InventoryClickEvent clickEvent, @NotNull Player player, int slot) {
-                GuiRegistry.openCraftGui(player, oreId);
+                //
             }
         });
 
@@ -152,76 +150,7 @@ public class StorageGuiHandler extends GuiHandler implements AutoRefresh {
 
         resetBulk("quick-sell");
 
-        if (player.hasPermission("oreprocessor.quick-sell")) {
-            Optional<ShopProvider> shopProvider = plugin.integrationManager.getShopProvider(OreProcessor.getApi().getShopProvider());
-            if (shopProvider.isPresent()) {
-                ItemBuilder itemBuilder = stored == 0 ? GuiRegistry.STORAGE.getQuickSellEmptyIcon() : GuiRegistry.STORAGE.getQuickSellAvailableIcon();
-                itemBuilder.replaceDisplay(s -> s
-                        .replace("{storage-current}", Integer.toString(stored))
-                        .replace("{storage-capacity}", Integer.toString(cap)));
-                setBulk("quick-sell", itemBuilder.build());
-
-                visitComponent("quick-sell", Slot::clearEvents);
-
-                if (stored > 0) {
-                    listen("quick-sell", new ClickEvent() {
-                        @Override
-                        public void onClick(@NotNull InventoryClickEvent clickEvent, @NotNull Player player, int slot) {
-                            Optional<ShopProvider> shopProvider = plugin.integrationManager.getShopProvider(OreProcessor.getApi().getShopProvider());
-                            if (!shopProvider.isPresent()) return;
-
-                            Double proportion = plugin.mainConfig.accessibilitySettings.quickSellRatio.get(clickEvent.getClick());
-                            if (proportion == null || proportion <= 0) return;
-
-                            MutableDouble profits = new MutableDouble(0);
-                            MutableDouble count = new MutableDouble(0);
-                            for (Material product : oreData.getProducts()) {
-                                if (!shopProvider.get().canSell(product)) continue;
-                                int amount = (int) (oreData.countProduct(product) * proportion);
-                                if (amount <= 0) continue;
-
-                                oreData.testAndTakeProduct(product, amount, actual -> {
-                                    count.add(actual);
-                                    int currentAmount = oreData.countProduct(product);
-                                    double profit = shopProvider.get().getSellPrice(product, actual);
-                                    EconomyResponse trans = plugin.economy.depositPlayer(player, profit);
-                                    ScopedLog log = plugin.pluginLogger.scope("quick-sell")
-                                            .add("player", player)
-                                            .add("ore", ore)
-                                            .add("product", product)
-                                            .add("expectedAmount", amount)
-                                            .add("takenAmount", actual)
-                                            .add("profits", profit)
-                                            .add("oldTotalAmount", currentAmount);
-                                    if (trans.transactionSuccess()) {
-                                        profits.add(profit);
-                                        log.add("newTotalAmount", currentAmount - actual);
-                                    } else {
-                                        plugin.getLogger().warning(String.format(
-                                                "Failed to deposit %.3f to %s's account for selling %d %s",
-                                                profit, player.getName(), actual, product.getKey()
-                                        ));
-                                        log.add("newTotalAmount", currentAmount);
-                                    }
-                                    log.add("transaction", trans)
-                                            .add("success", trans.transactionSuccess())
-                                            .flush();
-                                    return trans.transactionSuccess();
-                                });
-                            }
-
-                            if (count.doubleValue() == 0) return;
-
-                            player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
-                            plugin.msg(player, plugin.messageConfig.quickSellSuccess
-                                    .replace("{amount}", count.toString())
-                                    .replace("{profits}", numberFormat.format(profits.doubleValue()))
-                            );
-                        }
-                    });
-                }
-            }
-        }
+        //
     }
 
     private void handleAddProduct(Player player, ItemStack cursor, Collection<Material> products) {
